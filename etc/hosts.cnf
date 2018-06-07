@@ -1,0 +1,13 @@
+# CONF 
+# vim: noet si ai syn=sh: 
+
+# (c) 2017, Andres Aquino <inbox@andresaquino.sh>
+# This file is licensed under the BSD License version 3 or later. 
+# See the LICENSE file.
+
+# ip address		# domain 
+
+# andresaquino.dev
+192.168.1.10		host01.andresaquino.dev
+192.168.1.20		host02.andresaquino.dev
+

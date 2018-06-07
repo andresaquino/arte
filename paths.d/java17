@@ -1,0 +1,8 @@
+# .path
+# vim: et si ai ft=sh:
+
+/opt/oracle/jvm/java1.7.0_21/
+
+/Library/Internet Plug-Ins/JavaAppletPlugin.plugin/Contents/Home/bin
+/usr/java/jdk1.7
+

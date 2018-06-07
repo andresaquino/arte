@@ -1,0 +1,21 @@
+# .path
+# vim: et si ai ft=sh:
+
+# for external apps
+
+# examples:
+# Groovy
+#${HOME}/Development/groovy-2.1.6/bin
+
+# Android SDK
+#${HOME}/Development/android-developer-tools/sdk/tools
+
+# Apache JMeter
+#${HOME}/Development/JMeter-2.11/bin
+
+# Oracle DB
+#/oracle/app/oracle/product/10.2.0.3/bin
+
+# Ruby Version Manager
+#${HOME}/.rvm/bin
+

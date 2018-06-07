@@ -1,0 +1,11 @@
+# Commands
+# vim: si ai ft=sh:
+
+export DIST_HOME=$PWD
+
+chmod 0750 lib/*.sh
+
+ln -sf ../lib/profileUpdate.sh bin/profileUpdate
+ln -sf ../lib/buildpkg.sh bin/buildpkg
+
+#bash bin/buildpkg

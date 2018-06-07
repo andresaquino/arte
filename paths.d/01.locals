@@ -1,0 +1,11 @@
+# .path
+# vim: et si ai ft=sh:
+
+# User Space binaries
+${HOME}/bin
+${HOME}/apps
+
+# from brew/OS-X
+/usr/local/bin
+/usr/local/sbin
+
