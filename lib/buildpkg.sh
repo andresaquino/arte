@@ -16,7 +16,7 @@ else
    # 
    # go home babe
    cd ${DIST_HOME}
-   PACK_VERSION=$(cat VERSION)
+   PACK_VERSION=$(cat .version)
    PACK_NAME="arte"
    PACK_RELEASE="${U_DATE:2:4}"
    PACK_DIST="${PACK_NAME}-v${PACK_VERSION}.${PACK_RELEASE}"
