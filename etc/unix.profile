@@ -45,7 +45,7 @@ init_terminal ()
 		[ $? != 0 ] && TLPATH=/var/tmp/.tlpath
 
 	fi
-
+	
 	# specific setup for SunOS
 	if [ "${U_LAND}" = "SunOS" ]; then
 		export LANGUAGE="en_US.UTF-8"
@@ -521,11 +521,13 @@ get_path ()
 	fi
 }
 
+# time
 get_timestamp ()
 {
 	echo "$(date '+%Y%m/%d %H:%M:%S')"
 }
 
+# time
 get_minimal_timestamp ()
 {
 	echo "$(date '+%Y%m%d·%H%Mµ%S')"
