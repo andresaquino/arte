@@ -1,13 +1,28 @@
 # CONF 
-# vim: ts=6 sw=6 sts=6 et si ai:
+# vim: ts=6 sw=6 sts=6 et si ai: 
 
 # (c) 2018, Andres Aquino <inbox@andresaquino.sh>
-# This file is licensed under the BSD License version 3 or later.
+# This file is licensed under the BSD License version 3 or later. 
 # See the LICENSE file.
 
-# IP Address            | Domain
+# for testing domains
+# https://tools.ietf.org/id/draft-chapin-rfc2606bis-00.html
+# Only
+# *.test
+# *.exampl
+# *.localhost
 
-# host: andresaquino.mac
-192.168.1.10		host01.andresaquino.mac
-192.168.1.20		host02.andresaquino.mac
+# IP Address            | Domain 
+
+# 
+# RaspberryPI
+192.168.86.147          monitor.localhost
+
+# 
+# Corporacion Impresora
+189.254.40.147          cisacv.localhost
+
+# 
+# Lab Silanes
+187.217.175.101         silanes.localhost
 

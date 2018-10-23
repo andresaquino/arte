@@ -1,6 +1,3 @@
-" .profile
-" vim: si ai ft=vim:
-
 " (c) 2018, Andres Aquino <inbox@andresaquino.sh>
 " This file is licensed under the BSD License version 3 or later.
 " See the LICENSE file.
@@ -21,22 +18,21 @@ scriptencoding utf-8
 
 " Be iMproved
 if has('vim_starting')
-  set nocompatible
+   set nocompatible
 endif
 
 let vimplug_exists=expand('~/.vim/autoload/plug.vim')
 
 if !filereadable(vimplug_exists)
-  if !executable("curl")
-    echoerr "You have to install curl or first install vim-plug yourself!"
-    execute "q!"
-  endif
-  echo "Installing Vim-Plug..."
-  echo ""
-  silent !\curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-  let g:not_finish_vimplug = "yes"
-
-  autocmd VimEnter * PlugInstall
+   if !executable("curl")
+      echoerr "You have to install curl or first install vim-plug yourself!"
+      execute "q!"
+   endif
+   echo "Installing Vim-Plug..."
+   echo ""
+   silent !\curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+   let g:not_finish_vimplug = "yes"
+   autocmd VimEnter * PlugInstall
 endif
 
 " Required:
@@ -50,13 +46,19 @@ call plug#begin(expand('~/.vim/plugged'))
 " A light and configurable statusline/tabline plugin for Vim
 Plug 'itchyny/lightline.vim'
 
+"" PowerLine
+" https://github.com/powerline/powerline
+" Powerline is a statusline plugin for vim, and provides statuslines 
+" and prompts for several other applications, including zsh, bash, tmux, IPython, Awesome and Qtile
+" Plug 'powerline/powerline'
+
 "" Stellarized
 " https://github.com/rafi/awesome-vim-colorschemes
 " Collection of awesome color schemes for Neo/vim, merged for quick use.
 Plug 'rafi/awesome-vim-colorschemes'
 
 "" VIM Polyglot
-" https://github.com/ekalinin/Dockerfile.vim
+" https://github.com/sheerun/vim-polyglot
 " A solid language pack for Vim.
 Plug 'sheerun/vim-polyglot'
 
@@ -74,6 +76,10 @@ Plug 'chiel92/vim-autoformat'
 " https://github.com/SirVer/ultisnips
 " The ultimate snippet solution for Vim.
 Plug 'SirVer/ultisnips'
+
+"" VIM Snippets
+" https://github.com/honza/vim-snippets
+" Snippets are separated from the engine.
 Plug 'honza/vim-snippets'
 
 "" SuperTab
@@ -96,9 +102,9 @@ Plug 'tpope/vim-commentary'
 Plug 'MattesGroeger/vim-bookmarks'
 
 "" EditorConfig
-" https://github.com/editorconfig/editorconfig-vim
+" https://github.com/sgur/vim-editorconfig
 " EditorConfig plugin for Vim
-Plug 'editorconfig/editorconfig-vim'
+Plug 'sgur/vim-editorconfig'
 
 "" GIT Integration
 " https://github.com/tpope/vim-fugitive
@@ -133,6 +139,15 @@ Plug 'ctrlpvim/ctrlp.vim'
 Plug 'mattn/webapi-vim'
 Plug 'mattn/gist-vim'
 
+"" Easy Align
+" https://github.com/junegunn/vim-easy-align
+" A Vim alignment plugin
+Plug 'junegunn/vim-easy-align'
+
+"" XML Edition
+" https://github.com/othree/xml.vim
+Plug 'othree/xml.vim'
+
 "" Modern matchit and matchparen replacement matchit.vim
 " https://github.com/andymass/vim-matchup
 " match-up is a drop-in replacement for the vim plugin matchit.vim.
@@ -144,15 +159,15 @@ Plug 'andymass/vim-matchup'
 
 "" DragVisuals
 " https://github.com/pablobfonseca/vim-dragvisualsG
-Plug 'pablobfonseca/vim-dragvisuals'
+" Plug 'pablobfonseca/vim-dragvisuals'
 
 "" VisualBlocks
 " https://github.com/vim-scripts/vis
-Plug 'vim-scripts/vis'
+" Plug 'vim-scripts/vis'
 
 "" tables
 " https://github.com/dhruvasagar/vim-table-mode
-Plug 'dhruvasagar/vim-table-mode'
+" Plug 'dhruvasagar/vim-table-mode'
 
 "" end
 call plug#end()
@@ -166,25 +181,27 @@ set fileencodings=utf-8
 set bomb
 set binary
 set ttyfast
-filetype plugin on
+filetype on
 filetype indent on
+filetype plugin on
+filetype plugin indent on
 
 " Fix backspace indent and show tab
 set backspace=indent,eol,start
-set listchars=tab:↦\ ,extends:#,nbsp:.
+set listchars=tab:↦\ ,extends:#,nbsp:.,eol:¬
+set showbreak=…
 hi SpecialKey ctermfg=grey guifg=grey
 
 " Tabs. May be overriten by autocmd rules
-set softtabstop=8
-set tabstop=4
-set shiftwidth=4
+set smartindent
+set smartcase
+set smarttab
 set noexpandtab
 
 " Searching
 set hlsearch
 set incsearch
 set ignorecase
-set smartcase
 set iskeyword=a-z,A-Z,48-57,_,.,-,>,@
 
 "" swp files
@@ -192,10 +209,11 @@ set nobackup
 "set noswapfile
 
 "" behaviour
+set hidden
+set confirm
 set autowrite
 set autoread
 set autoindent
-set smartindent
 set nowrap
 set noshowmode
 
@@ -204,6 +222,7 @@ set foldmethod=indent
 set foldnestmax=10
 set nofoldenable
 set foldlevel=2
+set conceallevel=0
 
 " shell
 if exists('$SHELL')
@@ -226,11 +245,16 @@ set modelines=10
 set title
 set titleold="Terminal"
 set titlestring=%F
-set colorcolumn=-1
+set colorcolumn=0
 set scrolloff=3
 
 "" go to last line
 autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
+
+" 
+nnoremap <C-H> :bnext<CR>
+nnoremap <C-L> :bprev<CR>
+nnoremap <C-I> :hide<CR>
 
 "" leader key
 let mapleader = ","
@@ -238,11 +262,12 @@ let mapleader = ","
 "" Buffers mapping
 " Mappings to access buffers
 " \b \f \g : go back/forward/last-used
-nnoremap <Leader>l :ls<CR>
-nnoremap <Leader>j :bp<CR>
-nnoremap <Leader>k :bn<CR>
-nnoremap <Leader>g :e#<CR>
-nnoremap <Leader>d :bd<CR>
+nnoremap <Leader>m :ls<CR>
+nnoremap <Leader>h :bp<CR>
+nnoremap <Leader>l :bn<CR>
+nnoremap <Leader>e :e#<CR>
+nnoremap <Leader>c :bd<CR>
+nnoremap <Leader>i :hid<CR>
 nnoremap <Leader>1 :1b<CR>
 nnoremap <Leader>2 :2b<CR>
 nnoremap <Leader>3 :3b<CR>
@@ -259,56 +284,83 @@ nnoremap <Leader>0 :10b<CR>
 "set verbosefile=vimdebug.log
 
 "" Colorscheme setup
-colorscheme nord
-"set background=dark
+" colorscheme nord
+" set background=dark
+colorscheme PaperColor
+
+"" Visual Align
+" Start interactive EasyAlign in visual mode (e.g. vipga)
+xmap ga <Plug>(EasyAlign)
+
+" Start interactive EasyAlign for a motion/text object (e.g. gaip)
+nmap ga <Plug>(EasyAlign)
 
 "" EditorConfig
 let g:EditorConfig_verbose = 0
 let g:EditorConfig_exclude_patterns = ['fugitive://.*', 'scp://.*']
 
-"" LightLine setup
+" These lines setup the environment to show graphics and colors correctly.
 if !has('gui_running')
-  set t_Co=256
+   set t_Co=256
+   set nocompatible
 endif
-set laststatus=2
+ 
+"" Powerline setup
+" let g:minBufExplForceSyntaxEnable = 1
+" python3 from powerline.vim import setup as powerline_setup
+" python3 powerline_setup()
+" python3 del powerline_setup
+ 
+" if ! has('gui_running')
+"    set ttimeoutlen=10
+"    augroup FastEscape
+"       autocmd!
+"       au InsertEnter * set timeoutlen=0
+"       au InsertLeave * set timeoutlen=1000
+"    augroup END
+" endif
+ 
+"" LightLine setup
 let g:lightline = {
-  \ 'active': {
-  \   'left': [ [ 'mode', 'paste' ],
-  \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ],
-  \   'right': [ [ 'lineinfo' ],
-  \              [ 'percent' ],
-  \              [ 'fileformat', 'fileencoding', 'filetype' ] ]
-  \ },
-  \ 'component_function': {
-  \   'gitbranch': 'fugitive#statusline'
-  \ },
+   \  'active': {
+   \     'left': [   [ 'mode', 'paste' ],
+   \                 [ 'gitbranch', 'readonly', 'filename', 'modified' ] ],
+   \     'right': [  [ 'lineinfo' ],
+   \                 [ 'percent' ],
+   \                 [ 'fileformat', 'fileencoding', 'filetype' ] ]
+   \ },
+   \  'component_function': {
+   \     'gitbranch': 'fugitive#statusline'
+   \ },
 \}
 
-"" Ultisnips setup
-" Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
-let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsJumpForwardTrigger="<c-b>"
-let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+set laststatus=2 " Always display the statusline in all windows
+set noshowmode " Hide the default mode text (e.g. -- INSERT -- below the statusline)
 
-"" IntentLine setup
-"let g:indentLine_color_term = 239
-"let g:indentLine_bgcolor_term = 202
+"" Ultisnips setup
+" Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
+let g:UltiSnipsExpandTrigger='<tab>'
+let g:UltiSnipsJumpForwardTrigger='<c-b>'
+let g:UltiSnipsJumpBackwardTrigger='<c-z>'
+
+" If you want :UltiSnipsEdit to split your window.
+let g:UltiSnipsEditSplit='vertical'
 
 "" CtrlP setup
 let g:ctrlp_map = '<c-p>'
 let g:ctrlp_cmd = 'CtrlP'
 let g:ctrlp_use_caching = 1
 let g:ctrlp_working_path_mode = 'ra'
-let g:ctrlp_clear_cache_on_exit = 1
+let g:ctrlp_clear_cache_on_exit = 0
 let g:ctrlp_cache_dir = $HOME.'/.ctrlpcache'
 let g:ctrlp_max_files = 1000
 let g:ctrlp_max_history = &history
 let g:ctrlp_max_depth = 10
 let g:ctrlp_user_command = [
-\ '.git', 'cd %s && git ls-files',
-\ 'rg %s --files --color=never --glob ""',
-\ 'find %s -type f'
-\ ]
+   \ '.git', 'cd %s && git ls-files',
+   \ 'rg %s --files --color=never --glob ""',
+   \ 'find %s -type f'
+   \ ]
 let g:ctrlp_custom_ignore = '\v[\/](\.git|\.hg|\.svn|\.git.*|\.git\/.*)$'
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.tar.gz,*.tgz,*.tbz
 nnoremap <leader>b :CtrlPBuffer<CR>
