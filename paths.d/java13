@@ -1,4 +1,5 @@
-# .path
-# vim: et si ai ft=sh:
-
+#
+# bin path of java 13
+# ej: /opt/sun/java13/bin
 /System/Library/Frameworks/JavaVM.framework/Versions/1.3/bin
+

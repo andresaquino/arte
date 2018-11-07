@@ -4,4 +4,4 @@
 
 
 
-More info at wiki/readme.md
+More info at wiki/arte.md

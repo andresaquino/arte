@@ -1,0 +1,48 @@
+# (c) 2018, Andrés Aquino <inbox@andresaquino.sh>
+# This file is licensed under the BSD License version 3 or later.
+# See the LICENSE file.
+# 
+
+# 
+# cd arte
+# cat etc/git_setup/gitconfig > ~/.gitconfig
+
+[user]
+   name = Andres Aquino
+	email = inbox@andresaquino.sh
+   signingkey = 6FC4C9EBAE36795C
+
+[color]
+   ui = true
+
+[format]
+   pretty = %Cred%h %ad%Creset : %C(bold blue)%an -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset
+   date = short
+
+[log]
+   date = short
+
+[core]
+   editor = vim
+   pager =
+
+[diff]
+   tool = vimdiff
+
+[difftool]
+   prompt = false
+
+[alias]
+   d = difftool
+   hist = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(auto)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)'
+
+[push]
+   default = current
+
+[pager]
+   diff = false
+
+[merge]
+	tool = vimdiff
+	conflictstyle = diff3
+	prompt = false

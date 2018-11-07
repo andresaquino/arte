@@ -1,0 +1,33 @@
+# (c) 2018, Andres Aquino <info(at)andresaquino.sh>
+# This file is licensed under the BSD License version 3 or later.
+# See the LICENSE file.
+
+#
+# Set a SSH Environment
+_setSSHEnvironment() {
+   local SSH_PID="${SSH_AGENT_PID}"
+   local SSH_AGENT=
+   local __agentrc="${__UPLocalPath}/.sshagentrc"
+
+   # exists a sshagent profile ?
+   if [[ -s "${__agentrc}" ]]; then
+      # use it
+      source "${__agentrc}"
+      SSH_PID="${SSH_AGENT_PID}"
+   fi
+
+   # search an ssh agent
+   if [[ -z "${SSH_PID}" ]]; then
+      # get ppid
+      SSH_PID="$(/bin/ps -x -o pid,user,uid,args | sed -n "s/^\([[:digit:]]*\).*${__OSUserID}.[[:alpha:]].*ssh-agent.*/\1/p")"
+
+      # if ssh-agent master process does not exist
+      if [[ -z "${SSH_PID}" ]]; then
+         # start a new process
+         $(which ssh-agent) | grep -E "[S]SH_" > ${__agentrc}
+      fi
+   fi
+
+}
+
+# vim: ft=sh:

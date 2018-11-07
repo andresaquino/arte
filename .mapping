@@ -1,11 +1,12 @@
-# Commands
-# vim: si ai ft=sh:
+#!/usr/bin/env bash
+# (c) 2018, Andres Aquino <inbox(at)andresaquino.sh>
+# This file is licensed under the BSD License version 3 or later.
+# See the LICENSE file.
+# 
 
+# 
 export DIST_HOME=$PWD
 
 chmod 0750 lib/*.sh
-
-ln -sf ../lib/profileUpdate.sh bin/profileUpdate
 ln -sf ../lib/buildpkg.sh bin/buildpkg
 
-#bash bin/buildpkg

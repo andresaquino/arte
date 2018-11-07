@@ -1,0 +1,18 @@
+# (c) 2018, Andres Aquino <inbox@andresaquino.sh>
+# This file is licensed under the BSD License version 3 or later.
+# See the LICENSE file.
+#
+
+# Unix-style newlines with a newline ending every file
+[*]
+indent_size = 3
+indent_style = space
+
+[*.{md,markdown}]
+indent_size = 4
+indent_style = space
+max_line_length = 200
+insert_final_newline = true
+
+#
+# vim: ft=dosini:

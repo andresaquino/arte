@@ -1,27 +1,8 @@
-# Git Ignore
-# bundler config
-.bundle
-
-# bundler gems
-Gemfile.lock
-vendor/*
-
-# byebug
-.byebug_history
-
-# ignore keystore & sqlite localdb
-db/*.db
-config/keystore/*
+# ignore
 
 # for this project
 stuff/*
-etc/vim.setup/iTerm-fonts
-etc/vim.setup/iTerm2-colors
-
-# Ignore all logfiles and tempfiles.
-log/*.*
-tmp/*.*
-pkgs/*.*
+tmp/*
 
 # by default
 # Compiled source

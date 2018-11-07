@@ -1,0 +1,706 @@
+#!/usr/bin/env bash
+# (c) 2018, Andres Aquino <inbox(at)andresaquino.sh>
+# This file is licensed under the BSD License version 3 or later.
+# See the LICENSE file.
+
+#
+# env initialization
+_initEnvironment () {
+   local __tempPath=""
+   local __sysBinaries=()
+   
+   # System binaries
+   __sysBinaries+=("/bin")
+   __sysBinaries+=("/sbin")
+   __sysBinaries+=("/usr/bin")
+   __sysBinaries+=("/usr/sbin")
+   __sysBinaries+=("/usr/local/bin")
+   __sysBinaries+=("/usr/local/sbin")
+   __sysBinaries+=("/usr/sfw/bin")
+   __sysBinaries+=("/usr/xpg4/bin")
+   for __eachpath in "${__sysBinaries[@]}"; do
+      [[ -d "${__eachpath}" ]] && __tempPath="${__eachpath}:${__tempPath}"
+   done
+
+   # optionally, user binaries
+   [[ -d "${HOME}/bin" ]] && __tempPath="${HOME}/bin:${__tempPath}"
+   [[ -d "${HOME}/Bin" ]] && __tempPath="${HOME}/Bin:${__tempPath}"
+
+   # Predefined profile variables
+   __OSSoftware="$(uname -s)"
+   __OSRelease=""
+   __OSHost="$(hostname)"
+   __OSUserID="$(id -u)"
+   __OSUsername="$(id -u -n)"
+   __OSNetAddress=""
+   __OSNetInterface=""
+   __OSFilemask="077"
+   __UPLocalPath="${HOME}/paths.d"
+   __UPLogfile="${__UPLocalPath}/profile.log"
+   __UPInitPath="${__UPLocalPath}/initpath"
+   __UPCachePath="${__UPLocalPath}/${__OSHost}.rc"
+   __UPFullname="Andres Aquino"
+   __UPMailbox="inbox(at)andresaquino.sh"
+   __UPWorkplace="AELabs!"
+   __UPEnvironment="development"
+   __UPVersion="0000000"
+   __UPType_none=0
+   __UPType_interactive=1
+   __UPType_term=2
+   __UPTerminalType=${__UPType_none}
+   __UPNow=""
+   __UPCmd_minimal=0
+   __UPCmd_normal=1
+   __UPCmd_full=2
+   __UPCommandMode=${__UPCmd_normal}
+   __UPMain="/usr/local/unixrc"
+   __UPLogofile="/usr/local/logo.info"
+   __UPSVCProfile=""
+   __firstTime=true
+   __LF="\\n"
+
+   # set bash parameters
+   HISTSIZE=1500
+   HISTCONTROL=ignoredups
+   MANPATH="${HOME}/manuals:${MANPATH}"
+
+   # set color cli parameters
+   CLICOLOR=1
+   LSCOLORS="DxxxcxdxBxegedabagacad"
+   LS_COLORS="fi=00:di=01;33:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:ex=01;32:*.tar=01;31:*.tgz=01;31:*.taz=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.gz=01;31:*.bz2=01;31:*.rpm=01;31:*.jar=01;31:"
+   GREP_OPTIONS="--color=auto"
+
+   # get version in a dynamic style using unixrc
+   if [[ -f "${__UPMain}" ]]; then
+      __UPVersion=$(openssl dgst -md5 "${__UPMain}" | sed -e "s/.*= //g")
+      __UPVersion="${__UPVersion:(-7)}"
+   fi
+
+   # validate __UPLocalPath
+   if [[ ! -d "${__UPLocalPath}" ]]; then
+      mkdir -p "${__UPLocalPath}"
+
+   # save init path
+   else
+      echo "${__tempPath}" > "${__UPInitPath}"
+      PATH="${__tempPath}"
+      [[ -s "${__UPCachePath}" ]] && PATH="$(cat ${__UPCachePath}):${PATH}"
+   fi
+
+   # local
+   export __OSSoftware
+   export __OSRelease
+   export __OSHost
+   export __OSUserID
+   export __OSUsername
+   export __OSNetAddress
+   export __OSNetInterface
+   export __OSFilemask
+   export __UPLocalPath
+   export __UPLogfile
+   export __UPInitPath
+   export __UPCachePath
+   export __UPType_none
+   export __UPType_interactive
+   export __UPType_term
+   export __UPTerminalType
+   export __UPFullname
+   export __UPMailbox
+   export __UPWorkplace
+   export __UPEnvironment
+   export __UPVersion
+   export __UPNow
+   export __UPCmd_minimal
+   export __UPCmd_normal
+   export __UPCmd_full
+   export __UPCommandMode
+   export __UPMain
+   export __UPLogofile
+   export __UPSVCProfile
+   export __LF
+
+   # of system
+   export LS_COLORS
+   export LSCOLORS
+   export CLICOLOR
+
+   #
+   # load OS properties
+   #_isOSHPUX
+   #_isOSSolaris
+   _isOSDarwin
+   _isOSLinux
+
+}
+
+#
+# add a new path to ${PATH}
+_addNewPath() {
+   # new path
+   local __initialPath=${PATH}
+   local __validPath=
+   local __finalPath=
+   local __count=0
+   
+   # r00t user?
+   [[ ${__OSUserID} -eq 0 ]] && return 0
+   
+   # if this a valid path then, it will be added to __stringPath
+   eval __validPath="${1}"
+   if [[ -d "${__validPath}" ]]; then
+      __finalPath="${__validPath}:${__initialPath}"
+      __initialPath="${__finalPath/:\./}"
+      # analyze each path
+      for __eachPath in ${__initialPath//:/ }; do
+         __count=$(echo "${__finalPath}" | grep -oE ":${__eachPath}" | wc -l)
+         __count=$(expr ${__count} + 0)
+         # this path is repeated, mark it
+         [[ ${__count} -gt 1 ]] && __finalPath="${__finalPath/${__eachPath}/_DELETE_}"
+      done
+      # delete all what does not useful (sanity)
+      __finalPath="$( echo "${__finalPath//_DELETE_/:}" | sed -e 's/^://g;s/\.\.*/\./g;s/\.::*/:/g;s/::*/:/g;s/:\.//g')"
+      __finalPath="${__finalPath}:."
+      # finally save on path
+      export PATH="${__finalPath}"
+   fi
+
+}
+
+#
+# get paths from
+_updatePath() {
+   # validate cache
+   local __cacheChanges=
+   local __stringPath=
+   local __validLines=
+   local __prePath=
+   local __finalPath=
+   local __freqPath=
+   local __eachPath=
+
+   #
+   # r00t user?
+   [[ ${__OSUserID} -eq 0 ]] && return 0
+
+   # current PATH changes?
+   __cacheChanges=false
+
+   # any file newer than ${__cachePath}
+   if [[ -s "${__UPCachePath}" ]]; then
+      __newfiles=$(find ${__UPLocalPath} -type f -iname '[0-9][0-9].*' -newer ${__UPCachePath} | wc -l)
+      __newfiles=$(expr ${__newfiles} + 0)
+      [[ ${__newfiles} -gt 0 ]] && __firstTime=true
+   
+   # sanity of PATH
+   else
+      PATH="$(cat ${__UPInitPath})"
+      __firstTime=true
+   fi
+
+   # of first time
+   ${__firstTime} && __cacheChanges=true
+
+   # had changes ?
+   if ${__cacheChanges}; then
+      # for each file with pattern 01.*
+      __stringPath=""
+      __validLines="$(grep -vE "(^$|^#|^ *)" ${__UPLocalPath}/??.* | cut -d':' -f2)"
+      while read -r __eachPath; do
+         # and if this a valid path then, it will be added to __stringPath
+         eval __validPath="${__eachPath}"
+         _addNewPath "${__validPath}"
+      done < <(printf "%s${retCar}" "${__validLines}")
+
+      # finally save on cache
+      echo "${PATH}" > "${__UPCachePath}"
+
+   # load paths from __UPCachePath
+   else
+      [[ ! -s "${__UPCachePath}" ]] && PATH="$(cat ${__UPInitPath})"
+
+   fi
+   __firstTime=false
+
+}
+
+#
+# load other variables from a file
+_setProfile () {
+   # look for in HOME/
+   local __lprofile=
+   local __userProfile="${1}-prof.rc"
+   if [[ "${__userProfile}" = "default-prof.rc" ]]; then
+      source "${HOME}/${__userProfile}"
+      return 0
+   fi
+
+   # look for __tmpPath
+   for __tmpPath in "${__UPLocalPath}" "/usr/local/arte/paths.d"; do
+      __lprofile="${__tmpPath}/${__userProfile}"
+      if [[ -s "${__lprofile}" ]]; then
+         source "${__lprofile}" > /dev/null 2>&1
+         return 0
+      fi
+   done
+   return 1
+}
+
+#
+# TODO: of a HP-UX session
+_isOSHPUX () {
+   #
+   # was __OSRelease already defined?
+   return 1
+
+}
+
+#
+# of a linux session
+_isOSLinux () {
+   #
+   # was __OSRelease already defined?
+   if [[ -n "${__OSRelease}" ]]; then
+      [[ "${__OSSoftware}" = "Linux" ]] && return 0
+      return 1
+   
+   # then, configure env.
+   else
+      local __useColor="--color=auto"
+      local __useLanguage="en_US.UTF-8"
+
+      #
+      __OSRelease="Linux"
+      if [ -x /usr/bin/lsb_release ]; then
+         __OSRelease="$(lsb_release -a | sed -n 's/Descri.*:.\(.*\)/\1/p')"
+      else
+         # TODO
+         if [ -f /etc/alpine-release ]; then
+            __OSRelease="Alpine $(cat /etc/alpine-release)"
+         fi
+
+         # ej. Red Hat Enterprise Linux ES release 3 (Taroon Update 6)
+         if [ -f /etc/redhat-release ]; then
+            __OSRelease="$(cat /etc/redhat-release)"
+         fi
+      fi
+      __OSRelease="${__OSRelease//release/ }"
+      __OSRelease="${__OSRelease//(*)/ }"
+
+      # get interface and ip address
+      __OSNetInterface=$(ip route show | sed -n "s/default.* dev \([a-zA-Z0-9]*\) .*/\1/p" | head -n1)
+      __OSNetAddress=$(ifconfig ${__OSNetInterface} 2> /dev/null | sed -n 's/.*inet \([0-9.]*\) .*/\1/p')
+
+      # set default language
+      LANG=${__useLanguage}
+      LC_ALL=${__useLanguage}
+      COLOR=${__useColor}
+
+      #
+      export LANG
+      export LC_ALL
+      export COLOR
+
+      # input mode && mask
+      # TODO: set +o / -o [emacs]
+      set +o emacs
+      set -o vi
+      umask ${__OSFilemask}
+   fi
+
+}
+
+#
+# of a darwin OSX session
+_isOSDarwin () {
+   #
+   # was __OSRelease already defined ?
+   if [[ -n ${__OSRelease} ]]; then
+      [[ "${__OSSoftware}" = "Darwin" ]] && return 0
+      return 1
+   
+   # no, then setup env.
+   else
+      local __useColor=""
+      local __useLanguage="en_US.UTF-8"
+
+      # release tags
+      __OSRelease="Mac"
+      if [ -x /usr/bin/sw_vers ]; then
+         __OSRelease=""
+         __OSRelease="${__OSRelease}$(/usr/bin/sw_vers | sed -n 's/.*tName:.[[:alpha:]]*.\([[:alpha:]]*\).\([[:alpha:]]*\)/\1\2/p') "
+         __OSRelease="${__OSRelease}$(/usr/bin/sw_vers | sed -n 's/.*tVersion:.\([[:alpha:]]*\)/\1/p')"
+      fi
+
+      # get interface and ip address
+      __OSNetInterface=$(route get default | sed -n "s/.*face: \([:alpha:]*\)/\1/p")
+      #__OSNetAddress=$(ifconfig ${__OSNetInterface} 2> /dev/null | sed -n 's/.*inet \([0-9.]*\) .*/\1/p')
+      __OSNetAddress=$(ipconfig getifaddr ${__OSNetInterface} )
+
+      # set default language
+      LANG=${__useLanguage}
+      LC_ALL=${__useLanguage}
+      COLOR=${__useColor}
+
+      #
+      export LANG
+      export LC_ALL
+      export COLOR
+
+      # input mode && mask
+      # TODO: set +o / -o [emacs]
+      set +o emacs
+      set -o vi
+      umask "${__OSFilemask}"
+   fi
+
+}
+
+#
+# get terminal code of color
+_getCColor () {
+   local __strParam=${1}
+   local __strColor=""
+
+   # is an user session
+   if _isInteractive; then
+      local __outpColor=""
+      local __attrColor=${__strParam:0:1}
+      local __foreColor=${__strParam:1:1}
+      local __backColor=${__strParam:2:1}
+      local __cmdlColor="."
+
+      __strColor=${__strParam}
+      if [[ ${#__strParam} -ge 4 ]]; then
+         __cmdlColor=${__strParam:3:1}
+         __strColor=${__strParam:0:3}
+      fi
+
+      # "..." => reset color
+      # "?___" => normal, bold, blink, dim, see dict
+      if [[ "${__attrColor}" != "." ]]; then
+         local __dictAttr=("sgr0" "bold" "dim" "smso" "smul" "blink" "rev" "invis")
+         __outpColor="${__outpColor}$(tput ${__dictAttr[${__attrColor}]})"
+      fi
+
+      # "_?__" => black, green, red, see dict
+      if [[ "${__foreColor}" != "." ]]; then
+         __outpColor="${__outpColor}$(tput setaf ${__foreColor})"
+      fi
+
+      # "__?_" => normal, bold, blink, dim, see dict as background
+      if [[ "${__backColor}" != "." ]]; then
+         [[ "${__foreColor}" = "." ]] && __outpColor="${__outpColor}$(tput setaf 9)"
+         __outpColor="${__outpColor}$(tput setab ${__backColor})"
+      fi
+
+      # "___?" => Commandline ?
+      if [[ "${__cmdlColor}" = "." ]]; then
+         __outpColor="\[${__outpColor}\]"
+      fi
+
+      #
+      echo "${__outpColor}"
+      return 0
+   fi
+}
+
+#
+# was running previously ?
+_isRunning () {
+   [ -n "${__OSSoftware}" ] && return 0
+   return 1
+}
+
+#
+# this session is interactive ?
+_isInteractive() {
+   #
+   [[ ${__UPTerminalType} -eq ${__UPType_interactive} ]] && return 0
+   [[ ${__UPTerminalType} -eq ${__UPType_term} ]] && return 1
+
+   #
+   # get stty options, valid when we have a TTY session
+   local __stty_parameters=${__UPLocalPath}/.sttytemp
+   stty -g 2> /dev/null 1> ${__stty_parameters}
+
+   #
+   # then, if __stty_parameters have data
+   if [[ -s "${__stty_parameters}" ]]; then
+      __UPTerminalType=${__UPType_interactive}
+      return 0
+   fi
+   __UPTerminalType=${__UPType_term}
+   return 1
+
+}
+
+#
+# have a logo file ?
+_showOSLogo() {
+   #
+   local __logofile="/usr/local/logo.info"
+
+   # feed my ego!
+   if [[ -r ${__logofile} ]]; then
+      clear
+      cat ${__logofile}
+   
+   # only shows hostname
+   else
+      _puts "$(_getHostname)"
+   fi
+
+   _puts "_"
+   return 0
+}
+
+#
+# prints a message
+_puts() {
+   # empty message?
+   [[ -z ${1} ]] && return 1
+
+   # let's go
+   local __message="${1}"
+   local __system="${__OSSoftware}"
+
+   case "${__system}" in
+      "Linux" | "Darwin" | "SunOS" )
+         echo -e -n "${__message} ${__LF}"
+         ;;
+      *)
+         echo "${__message} "
+         ;;
+   esac
+   return 0
+}
+
+#
+# get OS software & release version
+_getOSRelease() {
+   echo "${__OSRelease}"
+}
+
+#
+# get network address & device
+_getNetwork() {
+   echo "${__OSNetInterface}:${__OSNetAddress}"
+}
+
+#
+# get username
+_getUsername() {
+   echo "${__OSUsername}"
+}
+
+#
+# get hostname
+_getHostname() {
+   echo "${__OSHost}"
+}
+
+#
+# get time
+_getNow() {
+   _getCurrentTime
+   echo "${__UPNow[0]}${__UPNow[1]}${__UPNow[2]}-${__UPNow[3]}${__UPNow[4]}µ${__UPNow[5]}"
+}
+
+#
+# get only date
+_getDate() {
+   echo "${__UPNow[0]}-${__UPNow[1]}-${__UPNow[2]}"
+}
+
+#
+# get only hour
+_getHour() {
+   echo "${__UPNow[3]}:${__UPNow[4]} ${__UPNow[6]}"
+}
+
+#
+# get Current time => now()
+_getCurrentTime() {
+   # get time as array
+   __UPNow=("$(date "+%Y %m %d %H %M %S %Z")")
+}
+
+#
+# get current path
+_getCurrentPath() {
+   local __currentPath="$(/bin/pwd)"
+   local __arrPath=
+
+   # first, check cache path
+   _updatePath
+
+   # nice format of current path => » Users » andresaquino
+   if [[ ${__UPCommandMode} -eq ${__UPCmd_minimal} ]]; then
+      __arrPath=("${__currentPath//\// }")
+      if [[ ${#__arrPath[@]} -gt 3 ]]; then
+         echo " » ${__arrPath[-3]} » ${__arrPath[-2]} » ${__arrPath[-1]}"
+      else
+         echo "${__currentPath//\// » }"
+      fi
+      return 0
+   fi
+
+   # o normal mode => en0:192.168.86.238 » 20181107-1311µ11 » ~/Projects
+   if [[ ${__UPCommandMode} -eq ${__UPCmd_normal} ]]; then
+      echo "${__currentPath/$HOME/\~}"
+      return 0
+   fi
+
+   echo "${__currentPath}"
+
+}
+
+#
+# get version of this profile
+_getVersion() {
+   echo "Ver.${__UPVersion}"
+}
+
+#
+# show welcome
+# Developed by: Andres Aquino <inbox(at)andresaquino.sh>
+_showWelcome() {
+   _getCurrentTime
+   _puts "$(_getVersion) $(_getOSRelease) - a simple unix/shell profile "
+   _puts "Welcome!"
+
+}
+
+#
+# show information about the system
+_showInternals() {
+   _getCurrentTime
+   _puts "System Operating :$(_getOSRelease)"
+   _puts "Host Name        :$(_getHostname)"
+   _puts "Version profile  :$(_getVersion)"
+   _puts "Network          :$(_getNetwork)"
+   _puts "Current date     :$(_getDate)"
+   _puts "Current hour     :$(_getHour)"
+   _puts "Current PATH     :$(_getCurrentPath)"
+
+}
+
+#
+# show a full cmdline
+_setFullCommandline() {
+   # if you're a developer, set your git profile (yes...)
+   PROMPT_COMMAND=
+   __UPCommandMode=${__UPCmd_full}
+   local PS_1="${__LF}"
+   PS_1="${PS_1}$(_getCColor "03.")\$(_getNetwork) $(_getCColor "...")» "
+   PS_1="${PS_1}$(_getCColor "03.")\$(_getOSRelease) "
+   PS_1="${PS_1}$(_getCColor "08.")\$(_getNow) $(_getCColor "...")» "
+   PS_1="${PS_1}$(_getCColor "07.")\$(_getCurrentPath) ${__LF}"
+   [[ -n "${__UPSVCProfile}" ]] && PS_1="${PS_1}$(_getCColor "12.")\$(__git_ps1 '«%s» ')"
+   PS_1="${PS_1}$(_getCColor "04.")\$(_getUsername)$(_getCColor "0..")@"
+   PS_1="${PS_1}$(_getCColor "04.")\$(_getHostname) $(_getCColor "0..")\\$> "
+
+   export PS1="${PS_1}"
+   export PS2="  ..> "
+   export PS4="  ..> "
+   unset USERNAME
+
+}
+
+#
+# show a normal cmdline
+_setNormalCommandline() {
+   # if you're a developer, set your git profile (yes...)
+   PROMPT_COMMAND=
+   __UPCommandMode=${__UPCmd_normal}
+   local PS_1="${__LF}"
+   PS_1="${PS_1}$(_getCColor "04.")\$(_getHostname) $(_getCColor "...")» "
+   PS_1="${PS_1}$(_getCColor "03.")\$(_getNetwork) $(_getCColor "...")» "
+   PS_1="${PS_1}$(_getCColor "08.")\$(_getNow) $(_getCColor "...")» "
+   PS_1="${PS_1}$(_getCColor "07.")\$(_getCurrentPath) ${__LF}"
+   PS_1="${PS_1}$(_getCColor "03.")\$(_getOSRelease) "
+   [[ -n "${__UPSVCProfile}" ]] && PS_1="${PS_1}$(_getCColor "12.")\$(__git_ps1 '«%s» ')"
+   PS_1="${PS_1}$(_getCColor "04.")@\$(_getUsername) $(_getCColor "0..")\\$> "
+
+   #
+   export PS1="${PS_1}"
+   export PS2="  ..> "
+   export PS4="  ..> "
+   unset USERNAME
+
+}
+
+#
+# show a minimal cmdline
+_setMinimalCommandline() {
+   # if you're a developer, set your git profile (yes...)
+   unset PROMPT_COMMAND
+   local PS_1="${__LF}"
+   __UPCommandMode=${__UPCmd_minimal}
+   PS_1="${PS_1}$(_getCColor "17.")["
+   PS_1="${PS_1}$(_getCColor "04.")\$(_getHostname)"
+   PS_1="${PS_1}$(_getCColor "17.")]"
+   PS_1="${PS_1}$(_getCColor "03.")\$(_getCurrentPath) ${__LF}"
+   PS_1="${PS_1}$(_getCColor "08.")\$(_getNow) "
+   [[ -n "${__UPSVCProfile}" ]] && PS_1="${PS_1}$(_getCColor "11.")\$(__git_ps1 '«%s» ')"
+   PS_1="${PS_1}$(_getCColor "17.")@\$(_getUsername) \\$>$(_getCColor "0..") "
+
+   #
+   export PS1="${PS_1}"
+   export PS2="  ..> "
+   export PS4="  ++> "
+   unset USERNAME
+
+}
+
+#
+# TODO:
+# show a develoepr cmdline
+_setDeveloperCommandline() {
+   # set PS1
+   # if you're a developer, set your git profile (yes...)
+   PROMPT_COMMAND=_showDeveloperStats
+   local PS_1=""
+   if [[ -n "${__UPSVCProfile}" ]]; then
+      PS_1="${PS_1}$(_getCColor "14.")\$(_getNow) "
+      PS_1="${PS_1}$(_getCColor "11.")\$(__git_ps1 '«%s» ')"
+      PS_1="${PS_1}$(_getCColor "...")@\$(_getUsername) $(_getCColor "03.")\\$> $(_getCColor "...")"
+
+   else
+      PS_1="${PS_1}$(_getCColor "...")@ "
+      PS_1="${PS_1}$(_getCColor "04.")\$(_getNow) "
+      PS_1="${PS_1}$(_getCColor "17.")\\$>$(_getCColor "...") "
+
+   fi
+   #
+   export PS1="${PS_1}"
+   export PS2="  ..> "
+   export PS4="  ..> "
+   unset USERNAME
+
+}
+
+#
+# TODO:
+# show statistics
+_showDeveloperStats() {
+   tput sc
+   tput civis
+   tput home
+   echo -n "$(_getCColor "17.C")[ $(_getCColor "03.C")$(_getHostname) "
+   echo -n "$(_getCColor "17.C")| $(_getCColor "03.C")$(_getNetwork) "
+   echo -n "$(_getCColor "17.C")| $(_getCColor "04.C")$(_getCurrentPath) $(_getCColor "17.C")]"
+   tput rc
+   tput cnorm
+   tput sgr0
+}
+
+#
+# run main
+if ! _isRunning; then
+
+   # load environment & shell
+   _initEnvironment
+
+fi
+
