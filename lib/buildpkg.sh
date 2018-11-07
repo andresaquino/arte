@@ -1,46 +1,42 @@
-#!/bin/bash
-# vim: si ai ft=sh:
-
+#!/usr/bin/env bash
 # (c) 2018, Andres Aquino <inbox(at)andresaquino.sh>
 # This file is licensed under the BSD License version 3 or later.
 # See the LICENSE file.
 
-# go home babe
-# export DIST_HOME="Path of arte"
-PACK_VERSION=1.0
-if [ ! -d ${DIST_HOME} ];
+# v0.1.6
+__appTag="$(git tag -l | tail -1)"
+__appName="arte"
+__appHome="$(pwd)"
+if [ ! -f "${__appHome}/etc/unixrc" ];
 then
-   puts "Please, set DIST_HOME"
+   echo "Run in project directory."
    exit -1
 else
-   # 
    # go home babe
-   cd ${DIST_HOME}
-   PACK_VERSION=$(cat .version)
-   PACK_NAME="arte"
-   PACK_RELEASE="${U_DATE:2:4}"
-   PACK_DIST="${PACK_NAME}-v${PACK_VERSION}.${PACK_RELEASE}"
+   cd ${__appHome}
+   
+   # naming vars
+   __appPackage="${__appName}-${__appTag}"
+   __appFileName="${__appPackage}.tar.gz"
+   __appPckgName="${__appHome}/tmp/${__appFileName}"
+   
+   # if exists, delete
+   [[ -f "${__appPckgName}" ]] && rm -fr "${__appPckgName}"
 
-   # 
-   # create tmp/packages
-   echo "Compressing ${PACK_DIST} with ${COMPRESS}"
-   [ -f tmp/packages/${PACK_DIST}.tar.gz ] && rm -fr tmp/packages/${PACK_NAME}*
-   tar -c -v -f tmp/packages/${PACK_DIST}.tar.gz \
-	    --exclude=tmp/*.* \
-	    --exclude=log/*.* \
-	    --exclude=tmp/packages/*.* \
-	    --exclude=paths.d/*.path \
-	    --exclude=vim.setup/iTerm* \
-	    --exclude=docker  \
-	    --exclude=legacy  \
-	    --exclude=sandbox \
-	    --exclude=.git . > log/${PACK_DIST}.log 2>&1
+   # and create with tar
+   echo "Create package ${__appPackage}.tar.gz"
+   tar -c -v -f "${__appPckgName}" \
+      --exclude=tmp/*.* \
+	   --exclude=log/*.* \
+	   --exclude=paths.d/*.path \
+	   --exclude=vim.setup/iTerm* \
+	   --exclude=docker  \
+	   --exclude=legacy  \
+	   --exclude=sandbox \
+	   --exclude=.git . > "${__appHome}/log/${__appTag}.log" 2>&1
 
-   # 
-   # create a dist package and sign
-   cd tmp/packages
+   # get signature
    echo "Ready, creating signature and final pkg."
-   cp -p ${PACK_DIST}.tar.gz ${PACK_NAME}.tar.gz
-   openssl dgst -md5 ${PACK_DIST}.tar.gz > ${PACK_DIST}.md5
+   openssl dgst -md5 "${__appPckgName}" > "${__appHome}/tmp/${__appPackage}.md5"
 
 fi

@@ -1,5 +1,6 @@
-# .path
-# vim: et si ai ft=sh:
-
+#
+# bin path of java 14
+# ej: /opt/sun/java14/bin
 /opt/java/java1.4
 /opt/java1.4
+

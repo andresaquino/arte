@@ -1,10 +1,8 @@
-# Git Ignore
+# ignore
 
 # for this project
 stuff/*
 tmp/*
-etc/vim.setup/iTerm-fonts
-etc/vim.setup/iTerm2-colors
 
 # by default
 # Compiled source
