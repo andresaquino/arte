@@ -1,0 +1,10 @@
+#
+# $> /usr/libexec/java_home --verbose
+# Matching Java Virtual Machines (2):
+#    1.8.0_192, x86_64:	"Java SE 8"	/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home
+#    1.8.0_112, x86_64:	"Java SE 8"	/Library/Java/JavaVirtualMachines/jdk1.8.0_112.jdk/Contents/Home
+#
+# $> /usr/libexec/java_home -v 1.8.0_192
+# /Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home
+/Library/Java/JavaVirtualMachines/jdk1.8.0_112.jdk/Contents/Home
+

@@ -1,0 +1,45 @@
+# (c) 2018, Andrés Aquino <inbox@andresaquino.sh>
+# This file is licensed under the BSD License version 3 or later.
+# See the LICENSE file.
+# 
+
+#
+# cd arte
+# cp etc/ssh_setup/ssh_config ~/.ssh/config
+
+# default
+# # default
+Host *
+   Protocol 2,1
+   TCPKeepAlive yes
+   ConnectTimeout 0
+   ForwardAgent no
+   ForwardX11 no
+   VisualHostKey no
+   Compression yes
+   HostbasedAuthentication no
+   GSSAPIAuthentication no
+   GSSAPIDelegateCredentials no
+   StrictHostKeyChecking no
+   CheckHostIP yes
+
+# Labs!
+# 127.0.0.1
+# 10022 => sslhost.andresaquino.test
+Host webapp.andresaquino.test
+   User appuser
+   Port 10022
+   Protocol 2
+
+# 10122 => api.andresaquino.test
+Host api.andresaquino.test
+   User appuser
+   Port 10122
+   Protocol 2
+
+# 10222 => database.andresaquino.test
+Host database.andresaquino.test
+   User appuser
+   Port 10222
+   Protocol 2
+

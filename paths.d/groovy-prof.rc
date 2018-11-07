@@ -1,0 +1,9 @@
+# (c) 2018, Andres Aquino <info(at)andresaquino.sh>
+# This file is licensed under the BSD License version 3 or later.
+# See the LICENSE file.
+
+#
+# Set a Groovy Environment
+export GROOVY_HOME=/usr/local/opt/groovy/libexec
+
+# vim: ft=sh:

@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# (c) 2018, Andres Aquino <inbox(at)andresaquino.sh>
+# This file is licensed under the BSD License version 3 or later.
+# See the LICENSE file.
+#
+
+# set environment
+if [[ -f "/usr/local/unixrc" ]]; then
+   # load environment
+   . "/usr/local/unixrc"
+
+   # initialize shell
+   _updatePath
+
+   # have a shell
+   if _isInteractive; then
+      # load default profile
+      _setProfile "git"
+      _setProfile "java"
+      _setProfile "ruby"
+      _setProfile "ssh"
+      _setProfile "default"
+
+      # common alias
+      alias ls="ls -F"
+      alias ll="ls -l"
+      alias la="ll -a"
+      alias lt="la -t"
+      alias lr="lt -r"
+      alias grep="grep --color=auto"
+
+      # set input command style
+      _setMinimalCommandline
+
+      # everybody loves logos ;)
+      _showOSLogo
+      _showWelcome
+   fi
+
+else
+   echo "Can't found /usr/local/unixrc"
+
+fi
+

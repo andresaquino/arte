@@ -1,0 +1,13 @@
+# (c) 2018, Andres Aquino <info(at)andresaquino.sh>
+# This file is licensed under the BSD License version 3 or later.
+# See the LICENSE file.
+
+#
+# Set a docker Environment
+# $> docker-machine env
+#     export MACHINE_STORAGE_PATH=/VirtualBox/machine
+# $> eval $(docker-machine env default)
+
+
+
+# vim: ft=sh:

@@ -1,0 +1,29 @@
+# (c) 2018, Andres Aquino <inbox(at)andresaquino.sh>
+# This file is licensed under the BSD License version 3 or later.
+# See the LICENSE file.
+
+#
+# Use this file to define a generic profile
+
+#
+# ID
+__UPFullname="User Name"
+__UPMailbox="username@mailprovider.com"
+__UPWorkplace="Bashcademy"
+
+#
+# editor
+export EDITOR=vim
+
+#
+# when manipulate services
+export SYSTEMD_PAGER=
+
+#
+# search options
+export GREP_OPTIONS='--color=auto'
+
+# GitHUB
+# export HOMEBREW_GITHUB_API_TOKEN=
+
+# vim: ft=sh:
